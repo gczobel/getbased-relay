@@ -1,14 +1,14 @@
 services:
   relay:
     build: .
-    ports:
-      # Caddy is the only public entrypoint. Binding the relay to loopback
-      # prevents bypassing TLS, headers, and host-level request controls.
-      - "127.0.0.1:4000:4000"
-      # Self-service endpoints (HMAC-authed). Bind 127.0.0.1 on the host
-      # so they only expose through the reverse proxy (Caddy), not
-      # directly to the public IP. Set SELF_ENABLED=0 to turn them off.
-      - "127.0.0.1:4003:4003"
+    # Not published to the host at all - Caddy (below) is the only public
+    # entrypoint, reaching this over the internal compose network instead.
+    # 0.0.0.0:PORT and 127.0.0.1:PORT can't both be bound on the same host
+    # port at once (0.0.0.0 encompasses loopback), so Caddy's host-facing
+    # bind and a loopback-only bind here would conflict outright.
+    expose:
+      - "4000"
+      - "4003"
     volumes:
       - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/relay-data:/data
       - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/context-verifier-socket:/run/getbased-verifier
