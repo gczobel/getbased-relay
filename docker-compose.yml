@@ -10,8 +10,8 @@ services:
       # directly to the public IP. Set SELF_ENABLED=0 to turn them off.
       - "127.0.0.1:4003:4003"
     volumes:
-      - relay-data:/data
-      - context-verifier-socket:/run/getbased-verifier
+      - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/relay-data:/data
+      - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/context-verifier-socket:/run/getbased-verifier
     environment:
       - RELAY_PORT=4000
       - ADMIN_PORT=4002
@@ -50,8 +50,8 @@ services:
       # reach the service inside the container network.
       - "127.0.0.1:4001:4001"
     volumes:
-      - context-data:/opt/context-gateway/data
-      - context-verifier-socket:/run/getbased-verifier:ro
+      - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/context-data:/opt/context-gateway/data
+      - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/context-verifier-socket:/run/getbased-verifier:ro
     environment:
       - CONTEXT_BIND=0.0.0.0
       - CONTEXT_VERIFIER_SOCKET=/run/getbased-verifier/verifier.sock
@@ -85,7 +85,3 @@ services:
       timeout: 5s
       retries: 3
 
-volumes:
-  relay-data:
-  context-data:
-  context-verifier-socket:
