@@ -85,3 +85,22 @@ services:
       timeout: 5s
       retries: 3
 
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      # The relay's own ports (above) are loopback-only; this is the actual
+      # public entrypoint, terminating TLS in front of both. On-demand
+      # (not static per-hostname) internal certs, because Docker's port-NAT
+      # means Caddy sees an unpredictable local socket address per
+      # connection when there's no SNI (bare-IP access) - a pre-provisioned
+      # cert for one declared hostname doesn't match what Caddy actually
+      # sees and the handshake fails with a TLS internal_error.
+      - "4000:4000"
+      - "4003:4003"
+    volumes:
+      - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CONFIG_BASE_FOLDER:?set CONFIG_BASE_FOLDER in .env}/getbased-relay/caddy-data:/data
+    depends_on:
+      - relay
+
