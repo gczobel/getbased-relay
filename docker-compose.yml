@@ -24,7 +24,7 @@ services:
       - QUOTA_PER_OWNER_MB=10
       - QUOTA_GLOBAL_MB=1000
       - LOG_FORMAT=json
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=info
     restart: unless-stopped
     init: true
     read_only: true
