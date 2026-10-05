@@ -2,6 +2,40 @@
 
 Notable changes to getbased-relay are documented here. The project follows Semantic Versioning.
 
+## Unreleased
+
+## [2.0.1] - 2026-10-02
+
+### Security
+
+- Reject non-object JSON on self-service, verifier, and Agent Access routes and handle asynchronous request failures without crashing the service.
+- Reject noncanonical owner IDs and normalize the owner write-lock identity to decoded bytes.
+- Compare bearer token byte lengths before timing-safe comparison.
+
+### Fixed
+
+- Filter compacted replay timestamps from broadcasts as well as persistence, with fresh broadcasts sent under the owner write lock after a successful commit.
+- Enforce the projected global live-payload total on every write, fail closed if usage is unavailable, and allow the exact per-owner quota boundary.
+- Use consistent base64url owner IDs for usage metrics and owner activity.
+- Preserve upstream console error levels and scopes, and keep raw diagnostic output behind `ENABLE_EVOLU_LOGGING`.
+- Report database readiness from `/health`; clean up all service resources on shutdown or fatal defects.
+
+### Changed
+
+- Bundle Context Gateway 1.3.1 with the Agent Access request-validation and owner-ID fixes.
+- Pin both Docker images to Node.js 24.21.0 LTS and keep automated Docker updates within that major.
+- Update Node.js development types to 24.13.4 and the CodeQL action to 4.38.2.
+- Run the regression suite in the production relay image and verify the gateway image's context upload, persistence, read, and revocation in CI.
+- Update the locked Evolu core to `@evolu/common` 8.14.0 and Node adapter to 4.1.0, matching upstream relay 4.1.3.
+- Port upstream WebSocket heartbeats, the 16 MiB unsent broadcast limit, and shutdown guards into the replay-protected adapter.
+- Use upstream `runMain` for signal handling and fatal exit status; validate configured ports and reject truncated integer settings.
+- Run the regression suite in CI and cover existing Evolu 8.7 wire requests, malformed bodies, replay broadcasts, quotas, heartbeats, readiness, and process restart/shutdown.
+
+### Upgrade notes
+
+- Preserve the existing database volume, owner keys, environment settings, and HTTP/proxy routes. The current GetBased browser packages do not need to change for this upgrade.
+- Back up the relay volume before deployment. Global quota covers live encrypted payload bytes, not physical disk usage or tombstones; run one relay process per database.
+
 ## [2.0.0] - 2026-09-02
 
 ### Breaking changes
@@ -69,6 +103,7 @@ Notable changes to getbased-relay are documented here. The project follows Seman
 
 - Hardened Context Gateway input validation and closed a prototype-pollution finding.
 
+[2.0.1]: https://github.com/elkimek/getbased-relay/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/elkimek/getbased-relay/compare/v1.2.3...v2.0.0
 [1.2.3]: https://github.com/elkimek/getbased-relay/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/elkimek/getbased-relay/compare/v1.2.1...v1.2.2
